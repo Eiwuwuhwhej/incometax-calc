@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Indian Freelancer Tax Calculator (FY 2026-27)</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="stylesheet" href="styles.min.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Freelancer Tax Calculator</h1>
+      <div class="subtitle">Updated for FY 2026-27 (AY 2027-28) | India</div>
+
+      <div class="form-section">
+        <h2 class="section-title">Income Details</h2>
+        <div class="grid">
+          <div class="input-group">
+            <label>Total Freelance Gross Receipts (₹)</label>
+            <small>Total invoices billed in the financial year.</small>
+            <input
+              type="number"
+              id="grossReceipts"
+              placeholder="e.g., 2400000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Amount Received in Cash (₹)</label>
+            <small>Required to calculate ₹50L vs ₹75L threshold for Section 44ADA.</small>
+            <input
+              type="number"
+              id="cashReceipts"
+              placeholder="e.g., 0"
+              value="0"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Export Income (₹)</label>
+            <small>Helps determine GST registration threshold.</small>
+            <input
+              type="number"
+              id="exportIncome"
+              placeholder="e.g., 0"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Interest Income (₹)</label>
+            <small>Savings interest or fixed deposit income.</small>
+            <input
+              type="number"
+              id="interestIncome"
+              placeholder="e.g., 20000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Rental Income (₹)</label>
+            <small>Rental receipts or other passive income.</small>
+            <input
+              type="number"
+              id="rentalIncome"
+              placeholder="e.g., 120000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Actual Business Expenses (₹)</label>
+            <small>Software, internet, depreciation, coworking rent, etc.</small>
+            <input
+              type="number"
+              id="expenses"
+              placeholder="e.g., 300000"
+              min="0"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2 class="section-title">Deductions & Credits</h2>
+        <div class="grid">
+          <div class="input-group">
+            <label>80C Deductions (₹)</label>
+            <small>PPF, ELSS, LIC. Capped at ₹1,50,000.</small>
+            <input
+              type="number"
+              id="deduction80C"
+              placeholder="e.g., 150000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>80CCD(1B) NPS (₹)</label>
+            <small>Extra NPS deduction up to ₹50,000.</small>
+            <input
+              type="number"
+              id="deduction80CCD"
+              placeholder="e.g., 50000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>80D Health Insurance (₹)</label>
+            <small>Health insurance premium. Capped at ₹50,000.</small>
+            <input
+              type="number"
+              id="deduction80D"
+              placeholder="e.g., 25000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>Section 24b Home Loan Interest (₹)</label>
+            <small>Capped at ₹2,00,000 for self-occupied property.</small>
+            <input
+              type="number"
+              id="homeLoanInterest"
+              placeholder="e.g., 180000"
+              min="0"
+            />
+          </div>
+          <div class="input-group">
+            <label>TDS Already Deducted (₹)</label>
+            <small>Amount already withheld by clients.</small>
+            <input
+              type="number"
+              id="tdsDeducted"
+              placeholder="e.g., 24000"
+              min="0"
+              value="0"
+            />
+          </div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="calculateTaxes()">
+        Calculate Tax Liability
+      </button>
+      <a class="btn small" href="know-about.html">
+        Know About Inputs & Filing
+      </a>
+
+      <div id="alertBanner" class="alert"></div>
+
+      <div class="results" id="results">
+        <div id="report">
+          <h2>Comparison Matrix</h2>
+          <div class="card-container">
+            <!-- 44ADA New Regime -->
+            <div class="card" id="card-new-44ada">
+              <h3>Sec 44ADA + New Regime</h3>
+              <p>Taxable Income: <span id="inc-new-44ada"></span></p>
+              <div class="val" id="tax-new-44ada"></div>
+              <p class="card-note">(No deduction tracking needed)</p>
+            </div>
+
+            <!-- 44ADA Old Regime -->
+            <div class="card" id="card-old-44ada">
+              <h3>Sec 44ADA + Old Regime</h3>
+              <p>Taxable Income: <span id="inc-old-44ada"></span></p>
+              <div class="val" id="tax-old-44ada"></div>
+              <p class="card-note">(Claiming Chapter VI-A ded.)</p>
+            </div>
+
+            <!-- Regular New Regime -->
+            <div class="card" id="card-new-reg">
+              <h3>Regular Method + New Regime</h3>
+              <p>Taxable Income: <span id="inc-new-reg"></span></p>
+              <div class="val" id="tax-new-reg"></div>
+              <p class="card-note">(Deducting actual expenses)</p>
+            </div>
+
+            <!-- Regular Old Regime -->
+            <div class="card" id="card-old-reg">
+              <h3>Regular Method + Old Regime</h3>
+              <p>Taxable Income: <span id="inc-old-reg"></span></p>
+              <div class="val" id="tax-old-reg"></div>
+              <p class="card-note">(Actual Exp + Chap VI-A ded.)</p>
+            </div>
+          </div>
+
+          <div class="summary-row">
+            <div class="summary-item">
+              <strong>Net Tax Payable</strong>
+              <div id="net-tax">₹ 0</div>
+            </div>
+            <div class="summary-item">
+              <strong>Tax Refund Expected</strong>
+              <div id="tax-refund">₹ 0</div>
+            </div>
+            <div class="summary-item">
+              <strong>Recommended Filing</strong>
+              <div id="itr-recommendation">N/A</div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Financial Breakdown</h3>
+            <canvas id="summaryChart" height="240"></canvas>
+          </div>
+
+          <div class="breakdown-panel">
+            <button class="btn small" onclick="toggleBreakdown()">
+              View Calculation Breakdown
+            </button>
+            <div id="breakdown" class="breakdown-content">
+              <p><strong>Scenario:</strong> <span id="breakdownScenario"></span></p>
+              <p><strong>Base Tax:</strong> <span id="breakdownBaseTax"></span></p>
+              <p><strong>Surcharge:</strong> <span id="breakdownSurcharge"></span></p>
+              <p><strong>Health & Education Cess (4%):</strong> <span id="breakdownCess"></span></p>
+              <p><strong>Total Tax:</strong> <span id="breakdownTotalTax"></span></p>
+            </div>
+          </div>
+
+          <div class="schedule-card">
+            <h3>Advance Tax Schedule</h3>
+            <table class="schedule-table" id="advanceSchedule"></table>
+          </div>
+        </div>
+        <button class="btn" onclick="downloadReport()">
+          Export Report as PDF
+        </button>
+      </div>
+
+    </div>
+
+    <script src="script.min.js"></script>
+  </body>
+</html>
