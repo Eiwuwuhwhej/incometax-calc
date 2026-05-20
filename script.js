@@ -73,37 +73,44 @@ function getTaxDetails(income, regime) {
 
 function toggleBreakdown() {
   const breakdown = document.getElementById("breakdown");
-  breakdown.style.display = breakdown.style.display === "block" ? "none" : "block";
+  breakdown.style.display =
+    breakdown.style.display === "block" ? "none" : "block";
 }
 
 function updateChart(takeHome, taxesPaid, businessExpenses) {
-  loadScript("https://cdn.jsdelivr.net/npm/chart.js").then(() => {
-    const ctx = document.getElementById("summaryChart").getContext("2d");
-    if (summaryChart) summaryChart.destroy();
-    summaryChart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: ["Take-Home Pay", "Taxes Paid", "Business Expenses"],
-        datasets: [
-          {
-            data: [takeHome, taxesPaid, businessExpenses],
-            backgroundColor: ["#2563eb", "#ef4444", "#10b981"],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: 10 },
-        plugins: {
-          legend: { position: "bottom" },
-          tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatINR(ctx.raw)}` } },
+  loadScript("https://cdn.jsdelivr.net/npm/chart.js")
+    .then(() => {
+      const ctx = document.getElementById("summaryChart").getContext("2d");
+      if (summaryChart) summaryChart.destroy();
+      summaryChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Take-Home Pay", "Taxes Paid", "Business Expenses"],
+          datasets: [
+            {
+              data: [takeHome, taxesPaid, businessExpenses],
+              backgroundColor: ["#2563eb", "#ef4444", "#10b981"],
+            },
+          ],
         },
-      },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: 10 },
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.label}: ${formatINR(ctx.raw)}`,
+              },
+            },
+          },
+        },
+      });
+    })
+    .catch((err) => {
+      console.error("Failed to load Chart.js", err);
     });
-  }).catch(err => {
-    console.error("Failed to load Chart.js", err);
-  });
 }
 
 function renderAdvanceSchedule(netPayable, chosenScenario, tdsCovered) {
@@ -123,8 +130,7 @@ function renderAdvanceSchedule(netPayable, chosenScenario, tdsCovered) {
   }
 
   if (chosenScenario.includes("44ADA")) {
-    table.innerHTML =
-      `<tr><th>Due Date</th><th>Installment</th><th>Amount</th></tr><tr><td>March 15</td><td>100%</td><td>${formatINR(netPayable)}</td></tr>`;
+    table.innerHTML = `<tr><th>Due Date</th><th>Installment</th><th>Amount</th></tr><tr><td>March 15</td><td>100%</td><td>${formatINR(netPayable)}</td></tr>`;
     return;
   }
 
@@ -149,12 +155,16 @@ function renderAdvanceSchedule(netPayable, chosenScenario, tdsCovered) {
 }
 
 function downloadReport() {
-  loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js").then(() => {
-    const element = document.getElementById("report");
-    html2pdf().from(element).save("freelancer-tax-report.pdf");
-  }).catch(err => {
-    console.error("Failed to load html2pdf.js", err);
-  });
+  loadScript(
+    "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js",
+  )
+    .then(() => {
+      const element = document.getElementById("report");
+      html2pdf().from(element).save("freelancer-tax-report.pdf");
+    })
+    .catch((err) => {
+      console.error("Failed to load html2pdf.js", err);
+    });
 }
 
 function calculateTaxes() {
@@ -164,8 +174,7 @@ function calculateTaxes() {
     parseFloat(document.getElementById("cashReceipts").value) || 0;
   const exportIncome =
     parseFloat(document.getElementById("exportIncome").value) || 0;
-  const expenses =
-    parseFloat(document.getElementById("expenses").value) || 0;
+  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
   const interestIncome =
     parseFloat(document.getElementById("interestIncome").value) || 0;
   const rentalIncome =
@@ -201,7 +210,7 @@ function calculateTaxes() {
 
   const incRegOld = Math.max(
     0,
-    grossReceipts - expenses - totalDeductions + totalOtherIncome
+    grossReceipts - expenses - totalDeductions + totalOtherIncome,
   );
   const taxRegOldDetails = getTaxDetails(incRegOld, "old");
 
@@ -215,7 +224,7 @@ function calculateTaxes() {
 
     inc44ADAOld = Math.max(
       0,
-      grossReceipts * 0.5 - totalDeductions + totalOtherIncome
+      grossReceipts * 0.5 - totalDeductions + totalOtherIncome,
     );
     tax44ADAOldDetails = getTaxDetails(inc44ADAOld, "old");
   }
@@ -236,12 +245,12 @@ function calculateTaxes() {
 
   document.getElementById("inc-new-reg").innerText = formatINR(incRegNew);
   document.getElementById("tax-new-reg").innerText = formatINR(
-    taxRegNewDetails.total
+    taxRegNewDetails.total,
   );
 
   document.getElementById("inc-old-reg").innerText = formatINR(incRegOld);
   document.getElementById("tax-old-reg").innerText = formatINR(
-    taxRegOldDetails.total
+    taxRegOldDetails.total,
   );
 
   const validDetails = [
@@ -251,12 +260,12 @@ function calculateTaxes() {
   if (is44ADAEligible) {
     validDetails.push(
       { name: "44ADA + New Regime", details: tax44ADANewDetails },
-      { name: "44ADA + Old Regime", details: tax44ADAOldDetails }
+      { name: "44ADA + Old Regime", details: tax44ADAOldDetails },
     );
   }
 
   const best = validDetails.reduce((bestSoFar, candidate) =>
-    candidate.details.total < bestSoFar.details.total ? candidate : bestSoFar
+    candidate.details.total < bestSoFar.details.total ? candidate : bestSoFar,
   );
 
   document
@@ -280,27 +289,23 @@ function calculateTaxes() {
   const recommendation = best.name.includes("44ADA")
     ? "ITR-4 (Sugam) is recommended if eligible for Section 44ADA."
     : "ITR-3 is recommended; maintain Balance Sheet/P&L for Regular Method.";
-  document.getElementById("itr-recommendation").innerText =
-    recommendation;
+  document.getElementById("itr-recommendation").innerText = recommendation;
 
   document.getElementById("breakdownScenario").innerText = best.name;
   document.getElementById("breakdownBaseTax").innerText = formatINR(
-    best.details.baseTax
+    best.details.baseTax,
   );
   document.getElementById("breakdownSurcharge").innerText = formatINR(
-    best.details.surcharge
+    best.details.surcharge,
   );
   document.getElementById("breakdownCess").innerText = formatINR(
-    best.details.cess
+    best.details.cess,
   );
   document.getElementById("breakdownTotalTax").innerText = formatINR(
-    best.details.total
+    best.details.total,
   );
 
-  const takeHome = Math.max(
-    0,
-    totalIncome - expenses - best.details.total
-  );
+  const takeHome = Math.max(0, totalIncome - expenses - best.details.total);
   updateChart(takeHome, best.details.total, expenses);
 
   renderAdvanceSchedule(netTaxPayable, best.name, tdsDeducted);
