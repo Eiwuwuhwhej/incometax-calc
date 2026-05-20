@@ -424,11 +424,31 @@ const SCENARIO_META = {
   'Regular + Old Regime': 'Actual expenses + all Old Regime deductions (80C, NPS, Health Ins, Home Loan).',
 };
 
+/* ─── Animated Number Counter (#8) ───────────────────── */
+function animateCount(el, targetVal, duration = 700) {
+  const start = performance.now();
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased    = 1 - Math.pow(1 - progress, 3);
+    el.textContent = formatINR(Math.round(eased * targetVal));
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = formatINR(targetVal);
+  }
+  requestAnimationFrame(tick);
+}
+
 function renderHeroCard(best) {
-  document.getElementById('heroName').textContent      = best.name;
-  document.getElementById('heroTaxAmount').textContent = formatINR(best.details.total);
-  document.getElementById('heroIncome').textContent    = formatINR(best.income);
-  document.getElementById('heroNote').textContent      = SCENARIO_META[best.name] || '';
+  document.getElementById('heroName').textContent = best.name;
+  
+  const taxEl = document.getElementById('heroTaxAmount');
+  if (!state.hasCalc && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    animateCount(taxEl, best.details.total);
+  } else {
+    taxEl.textContent = formatINR(best.details.total);
+  }
+  
+  document.getElementById('heroIncome').textContent = formatINR(best.income);
+  document.getElementById('heroNote').textContent   = SCENARIO_META[best.name] || '';
 }
 
 function renderAlternativeCards(allScenarios, best, is44ADAElig) {
@@ -445,6 +465,50 @@ function renderAlternativeCards(allScenarios, best, is44ADAElig) {
         `</div>`
       );
     }).join('');
+}
+
+/* ─── Tax Savings Optimizer (#7) ─────────────────────── */
+function computeSavingsTips(best, is44ADAElig, fields, chapVIA, otherIncomeNet, grossReceipts, expenses) {
+  const tips = [];
+  const container = document.getElementById('savingsTipsContainer');
+  const list = document.getElementById('savingsTipsList');
+
+  const { deduction80C, deduction80CCD, deduction80D } = fields;
+  const currentTotal = best.details.total;
+
+  if (currentTotal > 0) {
+    const tryDeduction = (currentVal, maxLimit, text) => {
+      if (currentVal >= maxLimit) return;
+      const room = maxLimit - currentVal;
+      
+      const newChapVIA = chapVIA + room;
+      const newOtherOld = otherIncomeNet - newChapVIA;
+      
+      const incRegOld   = Math.max(0, grossReceipts - expenses + newOtherOld);
+      const inc44ADAOld = is44ADAElig ? Math.max(0, grossReceipts * 0.5 + newOtherOld) : Infinity;
+      
+      const taxRegOld = getTaxDetails(incRegOld, 'old').total;
+      const tax44ADAOld = is44ADAElig ? getTaxDetails(inc44ADAOld, 'old').total : Infinity;
+      
+      const bestPotentialOld = Math.min(taxRegOld, tax44ADAOld);
+      
+      if (bestPotentialOld < currentTotal) {
+        const saved = currentTotal - bestPotentialOld;
+        tips.push(`Invest ₹${formatIndianNumber(room)} more in ${text} → save <strong>${formatINR(saved)}</strong> in tax`);
+      }
+    };
+
+    tryDeduction(deduction80C, 150000, '80C (PPF/ELSS)');
+    tryDeduction(deduction80CCD, 50000, 'NPS 80CCD(1B)');
+    tryDeduction(deduction80D, 50000, 'Health Insurance (80D)');
+  }
+
+  if (tips.length > 0) {
+    list.innerHTML = tips.map(t => `<li>${t}</li>`).join('');
+    container.style.display = 'block';
+  } else {
+    container.style.display = 'none';
+  }
 }
 
 /* ─── PDF Export ─────────────────────────────────────── */
@@ -544,6 +608,9 @@ function calculateTaxes() {
 
   /* ── Store result for dark-mode re-renders & future features ── */
   state.lastResult = { takeHome, netPayable, expenses };
+
+  /* ── Generate Savings Tips ── */
+  computeSavingsTips(best, is44ADAElig, fields, chapVIA, otherNew, grossReceipts, expenses);
 
   /* ── Update DOM ── */
   renderHeroCard(best);

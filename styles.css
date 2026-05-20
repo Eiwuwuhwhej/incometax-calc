@@ -874,6 +874,60 @@ h1 {
   color: var(--text-1);
 }
 
+/* ── Tax Savings Tips (#7) ── */
+.savings-tips-container {
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  margin: 20px 0;
+}
+html.dark-mode .savings-tips-container {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.light-mode) .savings-tips-container {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+}
+
+.savings-tips-title {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: var(--green);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.savings-tips-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.savings-tips-list li {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.4;
+  position: relative;
+  padding-left: 20px;
+}
+.savings-tips-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-weight: bold;
+}
+.savings-tips-list strong {
+  color: var(--text-1);
+}
+
 .chart-card {
   min-height: 260px;
 }
