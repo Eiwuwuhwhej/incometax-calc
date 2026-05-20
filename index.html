@@ -8,12 +8,6 @@
       content="Free Indian Freelancer Tax Calculator for FY 2026-27. Instantly compare Old vs New Tax Regime and Section 44ADA to find your lowest tax liability. Includes advance tax schedule and PDF export."
     />
     <title>Indian Freelancer Tax Calculator (FY 2026-27)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
     <link rel="stylesheet" href="styles.css" />
@@ -351,7 +345,14 @@
           <!-- Chart -->
           <div class="chart-card">
             <h3>Financial Breakdown</h3>
-            <canvas id="summaryChart" height="240"></canvas>
+          <!-- SVG Donut Chart (#6 — zero external dependency) -->
+          <svg
+            id="summaryChart"
+            viewBox="0 0 320 240"
+            role="img"
+            aria-label="Financial breakdown donut chart"
+          ></svg>
+          <div id="chartLegend" class="chart-legend"></div>
           </div>
 
           <!-- Calculation breakdown -->
@@ -375,10 +376,15 @@
           </div>
         </div>
 
-        <!-- Export button (shown after first calc) -->
-        <button class="btn" id="exportBtn" onclick="downloadReport()" style="display:none">
-          Export Report as PDF
-        </button>
+        <!-- Export / Print buttons -->
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn" id="exportBtn" onclick="downloadReport()" style="display:none;flex:1">
+            Export Report as PDF
+          </button>
+          <button class="btn secondary" id="printBtn" onclick="window.print()" style="display:none;flex:1">
+            🖨️ Print Report
+          </button>
+        </div>
 
       </div>
     </div>

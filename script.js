@@ -586,6 +586,7 @@ function calculateTaxes() {
     document.getElementById('skeletonState').style.display = 'none';
     document.getElementById('report').style.display        = '';
     document.getElementById('exportBtn').style.display     = '';
+    document.getElementById('printBtn').style.display      = '';
     state.hasCalc = true;
   }
 }
