@@ -34,11 +34,9 @@ function getTaxDetails(income, regime) {
     else if (income <= 2400000) tax = 200000 + (income - 2000000) * 0.25;
     else tax = 300000 + (income - 2400000) * 0.3;
 
-    if (income <= 1200000) {
+    // Section 87A rebate for total income up to ₹7,00,000.
+    if (income <= 700000) {
       tax = 0;
-    } else {
-      let excess = income - 1200000;
-      if (tax > excess) tax = excess;
     }
 
     let surcharge = 0;
@@ -56,7 +54,10 @@ function getTaxDetails(income, regime) {
     else if (income <= 1000000) tax = 12500 + (income - 500000) * 0.2;
     else tax = 112500 + (income - 1000000) * 0.3;
 
-    if (income <= 500000) tax = 0;
+    // Section 87A rebate for total income up to ₹7,00,000.
+    if (income <= 700000) {
+      tax = 0;
+    }
 
     let surcharge = 0;
     if (income > 50000000) surcharge = tax * 0.37;
@@ -117,15 +118,9 @@ function renderAdvanceSchedule(netPayable, chosenScenario, tdsCovered) {
   const table = document.getElementById("advanceSchedule");
   table.innerHTML = "";
 
-  if (tdsCovered >= netPayable && netPayable <= 0) {
-    table.innerHTML =
-      "<tr><th>Note</th><td>TDS already covers your tax liability. No advance tax installment is required.</td></tr>";
-    return;
-  }
-
   if (netPayable <= 0) {
     table.innerHTML =
-      "<tr><th>Note</th><td>Tax refund is expected. Advance tax is not due.</td></tr>";
+      "<tr><th>Note</th><td>No advance tax is due at this time. Your liability is covered by TDS or a refund is expected.</td></tr>";
     return;
   }
 
@@ -305,8 +300,8 @@ function calculateTaxes() {
     best.details.total,
   );
 
-  const takeHome = Math.max(0, totalIncome - expenses - best.details.total);
-  updateChart(takeHome, best.details.total, expenses);
+  const takeHome = Math.max(0, totalIncome - expenses - netTaxPayable);
+  updateChart(takeHome, netTaxPayable, expenses);
 
   renderAdvanceSchedule(netTaxPayable, best.name, tdsDeducted);
 

@@ -14,6 +14,7 @@ A highly optimized, fully static web application built to help Indian freelancer
 ## Performance Optimizations
 
 This project has been heavily optimized for fast loading and low bandwidth usage:
+
 - **Dynamic Script Loading:** Heavy libraries (`Chart.js` and `html2pdf.js`) are lazy-loaded dynamically *only* when the user triggers the calculation or the PDF export.
 - **Minified Assets:** CSS and JavaScript are minified for production to reduce file sizes.
 - **Preconnect Headers:** Establishes early connections to external CDNs for faster dynamic script resolution.
@@ -24,17 +25,21 @@ This project has been heavily optimized for fast loading and low bandwidth usage
 This is a static website requiring no build tools or servers to run locally.
 
 ### Running Locally
+
 1. Simply clone the repository or download the files.
-2. Open `index.html` in your web browser. 
+2. Open `index.html` in your web browser.
 
 ### Minifying Assets (Optional)
+
 If you make changes to `styles.css` or `script.js` and want to update the production files (`styles.min.css`, `script.min.js`), you can use the included Python script.
 
 Requirements:
+
 - Python 3.x
 - `jsmin` package (`pip install jsmin`)
 
 Run the build script:
+
 ```bash
 python minify.py
 ```
@@ -42,10 +47,12 @@ python minify.py
 ## Deployment
 
 You can host this site on any static web host such as GitHub Pages, Vercel, Netlify, or an Apache/Nginx web server.
+
 - **Apache:** The included `.htaccess` file will automatically handle cache headers.
 - **Vercel:** The included `vercel.json` file handles cache headers.
 
 ## Tech Stack
+
 - HTML5
 - Vanilla CSS3
 - Vanilla JavaScript
