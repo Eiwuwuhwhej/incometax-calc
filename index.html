@@ -3,191 +3,336 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Free Indian Freelancer Tax Calculator for FY 2026-27. Instantly compare Old vs New Tax Regime and Section 44ADA to find your lowest tax liability. Includes advance tax schedule and PDF export."
+    />
     <title>Indian Freelancer Tax Calculator (FY 2026-27)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-    <link rel="stylesheet" href="styles.min.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Dark mode toggle -->
+    <button
+      class="dark-toggle"
+      id="darkToggle"
+      onclick="toggleDarkMode()"
+      aria-label="Toggle dark mode"
+      title="Toggle dark / light mode"
+    >🌙</button>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Sticky mobile summary bar -->
+    <div class="sticky-bar" id="stickyBar" aria-live="polite">
+      <span class="sticky-label">Net Tax Payable</span>
+      <strong class="sticky-amount" id="stickyAmount">₹ 0</strong>
+    </div>
+
     <div class="container">
       <h1>Freelancer Tax Calculator</h1>
-      <div class="subtitle">Updated for FY 2026-27 (AY 2027-28) | India</div>
+      <div class="subtitle">Updated for FY 2026-27 (AY 2027-28) · India</div>
 
+      <!-- ── Income Details ── -->
       <div class="form-section">
         <h2 class="section-title">Income Details</h2>
         <div class="grid">
+
           <div class="input-group">
-            <label>Total Freelance Gross Receipts (₹)</label>
-            <small>Total invoices billed in the financial year.</small>
+            <label for="grossReceipts">
+              Total Freelance Gross Receipts (₹)
+              <button
+                class="tip-btn"
+                data-tip="All professional fees and invoices billed during the financial year. Example: if you billed ₹24,00,000, enter 2400000."
+                aria-label="Help for Gross Receipts"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="grossReceipts"
-              placeholder="e.g., 2400000"
-              min="0"
+              placeholder="e.g., 24,00,000"
+              inputmode="numeric"
+              autocomplete="off"
             />
           </div>
-          <div class="input-group">
-            <label>Amount Received in Cash (₹)</label>
-            <small
-              >Required to calculate ₹50L vs ₹75L threshold for Section
-              44ADA.</small
-            >
+
+          <!-- Conditional: shown only when gross receipts > ₹50L -->
+          <div class="input-group" id="cashGroup" style="display:none">
+            <label for="cashReceipts">
+              Amount Received in Cash (₹)
+              <button
+                class="tip-btn"
+                data-tip="Cash payments received from clients. If cash receipts exceed 5% of total, your 44ADA limit drops from ₹75L to ₹50L."
+                aria-label="Help for Cash Receipts"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="cashReceipts"
               placeholder="e.g., 0"
+              inputmode="numeric"
               value="0"
-              min="0"
+              autocomplete="off"
             />
           </div>
+
           <div class="input-group">
-            <label>Export Income (₹)</label>
-            <small>Helps determine GST registration threshold.</small>
+            <label for="exportIncome">
+              Export Income (₹)
+              <button
+                class="tip-btn"
+                data-tip="Revenue earned from clients outside India. Only domestic receipts count towards the ₹20L GST registration threshold."
+                aria-label="Help for Export Income"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="exportIncome"
               placeholder="e.g., 0"
-              min="0"
+              inputmode="numeric"
+              autocomplete="off"
             />
           </div>
+
           <div class="input-group">
-            <label>Interest Income (₹)</label>
-            <small>Savings interest or fixed deposit income.</small>
+            <label for="interestIncome">
+              Interest Income (₹)
+              <button
+                class="tip-btn"
+                data-tip="Interest earned on savings accounts or fixed deposits during the year. Example: ₹20,000 from a bank FD."
+                aria-label="Help for Interest Income"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="interestIncome"
-              placeholder="e.g., 20000"
-              min="0"
+              placeholder="e.g., 20,000"
+              inputmode="numeric"
+              autocomplete="off"
             />
           </div>
+
           <div class="input-group">
-            <label>Rental Income (₹)</label>
-            <small>Rental receipts or other passive income.</small>
+            <label for="rentalIncome">
+              Rental Income (₹)
+              <button
+                class="tip-btn"
+                data-tip="Gross rent received during the year. A 30% standard deduction under Sec 24(a) is automatically applied in both tax regimes."
+                aria-label="Help for Rental Income"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="rentalIncome"
-              placeholder="e.g., 120000"
-              min="0"
+              placeholder="e.g., 1,20,000"
+              inputmode="numeric"
+              autocomplete="off"
             />
           </div>
+
           <div class="input-group">
-            <label>Actual Business Expenses (₹)</label>
-            <small
-              >Software, internet, depreciation, coworking rent, etc.</small
-            >
+            <label for="expenses">
+              Actual Business Expenses (₹)
+              <button
+                class="tip-btn"
+                data-tip="Software, internet, coworking rent, depreciation, subscriptions, etc. Used in the Regular Method calculation only."
+                aria-label="Help for Business Expenses"
+              >ⓘ</button>
+            </label>
             <input
-              type="number"
+              type="text"
               id="expenses"
-              placeholder="e.g., 300000"
-              min="0"
+              placeholder="e.g., 3,00,000"
+              inputmode="numeric"
+              autocomplete="off"
             />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── Deductions & Credits (Accordion) ── -->
+      <div class="form-section accordion-section">
+        <button
+          class="accordion-toggle"
+          id="deductionsToggle"
+          onclick="toggleDeductions()"
+          aria-expanded="false"
+          aria-controls="deductionsContent"
+        >
+          <span>Deductions &amp; Credits</span>
+          <span class="accordion-hint" id="deductionsHint">(80C · NPS · Health Ins · Home Loan · TDS)</span>
+          <span class="chevron" id="deductionsChevron">▼</span>
+        </button>
+
+        <div
+          class="accordion-content"
+          id="deductionsContent"
+          aria-hidden="true"
+        >
+          <div class="grid">
+
+            <div class="input-group">
+              <label for="deduction80C">
+                80C Deductions (₹)
+                <button
+                  class="tip-btn"
+                  data-tip="PPF, ELSS, LIC, NSC, ELSS mutual funds. Capped at ₹1,50,000. Applies in Old Regime only."
+                  aria-label="Help for 80C"
+                >ⓘ</button>
+              </label>
+              <input
+                type="text"
+                id="deduction80C"
+                placeholder="e.g., 1,50,000"
+                inputmode="numeric"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="deduction80CCD">
+                80CCD(1B) NPS (₹)
+                <button
+                  class="tip-btn"
+                  data-tip="Additional NPS contribution beyond the 80C limit. Capped at ₹50,000. Applies in Old Regime only."
+                  aria-label="Help for 80CCD"
+                >ⓘ</button>
+              </label>
+              <input
+                type="text"
+                id="deduction80CCD"
+                placeholder="e.g., 50,000"
+                inputmode="numeric"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="deduction80D">
+                80D Health Insurance (₹)
+                <button
+                  class="tip-btn"
+                  data-tip="Health insurance premium for self, family, and senior citizen parents. Capped at ₹50,000. Applies in Old Regime only."
+                  aria-label="Help for 80D"
+                >ⓘ</button>
+              </label>
+              <input
+                type="text"
+                id="deduction80D"
+                placeholder="e.g., 25,000"
+                inputmode="numeric"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="homeLoanInterest">
+                Sec 24b Home Loan Interest (₹)
+                <button
+                  class="tip-btn"
+                  data-tip="Interest paid on a self-occupied home loan. Capped at ₹2,00,000. Applies in Old Regime only."
+                  aria-label="Help for Home Loan Interest"
+                >ⓘ</button>
+              </label>
+              <input
+                type="text"
+                id="homeLoanInterest"
+                placeholder="e.g., 1,80,000"
+                inputmode="numeric"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="tdsDeducted">
+                TDS Already Deducted (₹)
+                <button
+                  class="tip-btn"
+                  data-tip="Tax already withheld from your payments by clients. This is credited against your final tax liability or refunded if excess."
+                  aria-label="Help for TDS"
+                >ⓘ</button>
+              </label>
+              <input
+                type="text"
+                id="tdsDeducted"
+                placeholder="e.g., 24,000"
+                inputmode="numeric"
+                value="0"
+                autocomplete="off"
+              />
+            </div>
+
           </div>
         </div>
       </div>
 
-      <div class="form-section">
-        <h2 class="section-title">Deductions & Credits</h2>
-        <div class="grid">
-          <div class="input-group">
-            <label>80C Deductions (₹)</label>
-            <small>PPF, ELSS, LIC. Capped at ₹1,50,000.</small>
-            <input
-              type="number"
-              id="deduction80C"
-              placeholder="e.g., 150000"
-              min="0"
-            />
-          </div>
-          <div class="input-group">
-            <label>80CCD(1B) NPS (₹)</label>
-            <small>Extra NPS deduction up to ₹50,000.</small>
-            <input
-              type="number"
-              id="deduction80CCD"
-              placeholder="e.g., 50000"
-              min="0"
-            />
-          </div>
-          <div class="input-group">
-            <label>80D Health Insurance (₹)</label>
-            <small>Health insurance premium. Capped at ₹50,000.</small>
-            <input
-              type="number"
-              id="deduction80D"
-              placeholder="e.g., 25000"
-              min="0"
-            />
-          </div>
-          <div class="input-group">
-            <label>Section 24b Home Loan Interest (₹)</label>
-            <small>Capped at ₹2,00,000 for self-occupied property.</small>
-            <input
-              type="number"
-              id="homeLoanInterest"
-              placeholder="e.g., 180000"
-              min="0"
-            />
-          </div>
-          <div class="input-group">
-            <label>TDS Already Deducted (₹)</label>
-            <small>Amount already withheld by clients.</small>
-            <input
-              type="number"
-              id="tdsDeducted"
-              placeholder="e.g., 24000"
-              min="0"
-              value="0"
-            />
-          </div>
-        </div>
-      </div>
-
-      <button class="btn" onclick="calculateTaxes()">
-        Calculate Tax Liability
-      </button>
-      <a class="btn small" href="know-about.html">
-        Know About Inputs & Filing
+      <a class="btn small secondary" href="know-about.html">
+        Know About Inputs &amp; Filing ↗
       </a>
 
-      <div id="alertBanner" class="alert"></div>
-
+      <!-- ── Results ── -->
       <div class="results" id="results">
-        <div id="report">
-          <h2>Comparison Matrix</h2>
-          <div class="card-container">
-            <!-- 44ADA New Regime -->
-            <div class="card" id="card-new-44ada">
-              <h3>Sec 44ADA + New Regime</h3>
-              <p>Taxable Income: <span id="inc-new-44ada"></span></p>
-              <div class="val" id="tax-new-44ada"></div>
-              <p class="card-note">(No deduction tracking needed)</p>
-            </div>
 
-            <!-- 44ADA Old Regime -->
-            <div class="card" id="card-old-44ada">
-              <h3>Sec 44ADA + Old Regime</h3>
-              <p>Taxable Income: <span id="inc-old-44ada"></span></p>
-              <div class="val" id="tax-old-44ada"></div>
-              <p class="card-note">(Claiming Chapter VI-A ded.)</p>
-            </div>
+        <!-- Skeleton / empty state -->
+        <div id="skeletonState" class="skeleton-state">
+          <div class="skeleton-icon">📊</div>
+          <p class="skeleton-prompt">
+            Enter your gross receipts above to instantly see your full tax breakdown across all four scenarios.
+          </p>
+          <div class="skeleton-bars">
+            <div class="skeleton-bar w-full"></div>
+            <div class="skeleton-bar w-3/4"></div>
+            <div class="skeleton-bar w-1/2"></div>
+          </div>
+        </div>
 
-            <!-- Regular New Regime -->
-            <div class="card" id="card-new-reg">
-              <h3>Regular Method + New Regime</h3>
-              <p>Taxable Income: <span id="inc-new-reg"></span></p>
-              <div class="val" id="tax-new-reg"></div>
-              <p class="card-note">(Deducting actual expenses)</p>
-            </div>
+        <!-- Calculated results (hidden until first calculation) -->
+        <div id="report" class="report-content" style="display:none">
+          <h2>Tax Analysis Results</h2>
 
-            <!-- Regular Old Regime -->
-            <div class="card" id="card-old-reg">
-              <h3>Regular Method + Old Regime</h3>
-              <p>Taxable Income: <span id="inc-old-reg"></span></p>
-              <div class="val" id="tax-old-reg"></div>
-              <p class="card-note">(Actual Exp + Chap VI-A ded.)</p>
+          <!-- Hero card: best option -->
+          <div id="heroCard" class="hero-card">
+            <div class="hero-badge">★ BEST OPTION</div>
+            <h3 class="hero-name" id="heroName"></h3>
+            <div class="hero-body">
+              <div class="hero-stat">
+                <span class="hero-label">Total Tax</span>
+                <div class="hero-amount" id="heroTaxAmount"></div>
+              </div>
+              <div class="hero-divider"></div>
+              <div class="hero-stat">
+                <span class="hero-label">Taxable Income</span>
+                <div class="hero-income-val" id="heroIncome"></div>
+              </div>
             </div>
+            <p class="hero-note" id="heroNote"></p>
           </div>
 
+          <!-- Compare other options -->
+          <button
+            class="alt-toggle-btn"
+            id="altToggleBtn"
+            onclick="toggleAlternatives()"
+            aria-expanded="false"
+            aria-controls="alternativesGrid"
+          >
+            <span>Compare Other Options</span>
+            <span class="chevron" id="altChevron">▼</span>
+          </button>
+          <div id="alternativesGrid" class="alternatives-grid" style="display:none" aria-hidden="true">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Summary row -->
           <div class="summary-row">
             <div class="summary-item">
               <strong>Net Tax Payable</strong>
@@ -203,47 +348,41 @@
             </div>
           </div>
 
+          <!-- Chart -->
           <div class="chart-card">
             <h3>Financial Breakdown</h3>
             <canvas id="summaryChart" height="240"></canvas>
           </div>
 
+          <!-- Calculation breakdown -->
           <div class="breakdown-panel">
             <button class="btn small" onclick="toggleBreakdown()">
               View Calculation Breakdown
             </button>
             <div id="breakdown" class="breakdown-content">
-              <p>
-                <strong>Scenario:</strong> <span id="breakdownScenario"></span>
-              </p>
-              <p>
-                <strong>Base Tax:</strong> <span id="breakdownBaseTax"></span>
-              </p>
-              <p>
-                <strong>Surcharge:</strong>
-                <span id="breakdownSurcharge"></span>
-              </p>
-              <p>
-                <strong>Health & Education Cess (4%):</strong>
-                <span id="breakdownCess"></span>
-              </p>
-              <p>
-                <strong>Total Tax:</strong> <span id="breakdownTotalTax"></span>
-              </p>
+              <p><strong>Scenario:</strong> <span id="breakdownScenario"></span></p>
+              <p><strong>Base Tax:</strong> <span id="breakdownBaseTax"></span></p>
+              <p><strong>Surcharge:</strong> <span id="breakdownSurcharge"></span></p>
+              <p><strong>Health &amp; Education Cess (4%):</strong> <span id="breakdownCess"></span></p>
+              <p><strong>Total Tax:</strong> <span id="breakdownTotalTax"></span></p>
             </div>
           </div>
 
+          <!-- Advance tax schedule -->
           <div class="schedule-card">
             <h3>Advance Tax Schedule</h3>
             <table class="schedule-table" id="advanceSchedule"></table>
           </div>
         </div>
-        <button class="btn" onclick="downloadReport()">
+
+        <!-- Export button (shown after first calc) -->
+        <button class="btn" id="exportBtn" onclick="downloadReport()" style="display:none">
           Export Report as PDF
         </button>
+
       </div>
     </div>
 
-    <script src="script.min.js"></script>
+    <script src="script.js"></script>
   </body>
 </html>
