@@ -429,12 +429,17 @@ h1 {
   overflow: hidden;
   transition:
     max-height 0.4s ease,
-    padding var(--t);
+    padding var(--t),
+    overflow 0s 0.4s;   /* stay hidden during animation, then reveal */
   padding: 0 26px;
 }
 .accordion-content.open {
   max-height: 600px;
   padding: 0 26px 26px;
+  overflow: visible;    /* allow absolutely-positioned tooltips to escape */
+  transition:
+    max-height 0.4s ease,
+    padding var(--t);   /* no delay when open — overflow flips after max-height */
 }
 
 /* ════════════════════════════════════════════════════════
