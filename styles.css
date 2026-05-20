@@ -971,11 +971,11 @@ h1 {
   border: 1px solid var(--amber);
   color: #78350f;
 }
-html.dark-mode .toast-warning,
+html.dark-mode .toast-warning {
+  color: #fcd34d;
+}
 @media (prefers-color-scheme: dark) {
-  :root:not(.light-mode) .toast-warning {
-    color: #fcd34d;
-  }
+  :root:not(.light-mode) .toast-warning { color: #fcd34d; }
 }
 
 .toast-icon {
